@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Base launch theme; Compose (ui/theme/Theme.kt) takes over as soon as content is set. -->
+    <style name="Theme.GeoAlarm" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
+    </style>
+
+    <!-- Lock-screen alarm trigger: full screen, no title bar, keeps the screen on. -->
+    <style name="Theme.GeoAlarm.AlarmTrigger" parent="android:Theme.Material.NoActionBar.Fullscreen">
+        <item name="android:windowShowWhenLocked" tools:targetApi="27">true</item>
+        <item name="android:windowTurnScreenOn" tools:targetApi="27">true</item>
+        <item name="android:windowBackground">@color/trigger_default_background</item>
+    </style>
+</resources>

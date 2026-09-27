@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">GeoAlarm</string>
+
+    <!-- Navigation -->
+    <string name="nav_alarms">Alarmes</string>
+    <string name="nav_settings">Ajustes</string>
+
+    <!-- Alarm list -->
+    <string name="alarm_list_title">Meus GeoAlarmes</string>
+    <string name="alarm_list_empty">Nenhum geo-alarme ainda. Toque em + para criar o primeiro.</string>
+    <string name="alarm_list_add">Novo geo-alarme</string>
+    <string name="alarm_radius_label">%1$d m de raio</string>
+    <string name="alarm_transition_enter">Ao entrar na área</string>
+    <string name="alarm_transition_exit">Ao sair da área</string>
+
+    <!-- Alarm edit -->
+    <string name="edit_title_hint">Título do alarme</string>
+    <string name="edit_message_hint">Mensagem de aviso</string>
+    <string name="edit_section_location">Localização</string>
+    <string name="edit_section_schedule">Dias ativos</string>
+    <string name="edit_section_sound">Som e vibração</string>
+    <string name="edit_section_lockscreen">Tela de toque</string>
+    <string name="edit_section_snooze">Soneca</string>
+    <string name="edit_pick_on_map">Escolher no mapa</string>
+    <string name="edit_use_current_location">Usar localização atual</string>
+    <string name="edit_radius">Raio de alcance</string>
+    <string name="edit_sound_enabled">Som</string>
+    <string name="edit_vibration_enabled">Vibração</string>
+    <string name="edit_choose_ringtone">Escolher toque</string>
+    <string name="edit_import_audio">Importar áudio do dispositivo</string>
+    <string name="edit_vibration_pattern">Padrão de vibração</string>
+    <string name="edit_volume_fade_in">Volume crescente (fade-in)</string>
+    <string name="edit_dismiss_style">Estilo de descarte</string>
+    <string name="edit_show_clock">Mostrar hora atual</string>
+    <string name="edit_show_distance">Mostrar distância restante</string>
+    <string name="edit_background">Fundo da tela de alarme</string>
+    <string name="edit_snooze_type">Tipo de soneca</string>
+    <string name="edit_snooze_minutes">Minutos de soneca</string>
+    <string name="edit_snooze_distance">Distância mínima para nova soneca</string>
+    <string name="edit_save">Salvar</string>
+    <string name="edit_delete">Excluir alarme</string>
+
+    <!-- Dismiss styles -->
+    <string name="dismiss_style_button">Botão simples</string>
+    <string name="dismiss_style_swipe">Arrastar para o lado</string>
+    <string name="dismiss_style_hold">Manter pressionado</string>
+
+    <!-- Vibration patterns -->
+    <string name="vibration_none">Nenhuma</string>
+    <string name="vibration_continuous">Contínuo</string>
+    <string name="vibration_short_pulse">Pulso curto</string>
+    <string name="vibration_sos">SOS</string>
+    <string name="vibration_heartbeat">Batimento cardíaco</string>
+
+    <!-- Snooze -->
+    <string name="snooze_none">Sem soneca</string>
+    <string name="snooze_time">Por tempo</string>
+    <string name="snooze_distance">Por distância</string>
+
+    <!-- Trigger screen -->
+    <string name="trigger_hold_to_dismiss">Mantenha pressionado para desligar</string>
+    <string name="trigger_swipe_to_dismiss">Arraste para desligar</string>
+    <string name="trigger_snooze">Soneca</string>
+    <string name="trigger_dismiss">Desligar</string>
+    <string name="trigger_distance_away">%1$s restantes</string>
+
+    <!-- Settings -->
+    <string name="settings_theme">Tema</string>
+    <string name="settings_theme_light">Claro</string>
+    <string name="settings_theme_dark">Escuro</string>
+    <string name="settings_theme_system">Automático (do sistema)</string>
+    <string name="settings_accent_color">Cor de destaque</string>
+
+    <!-- Notifications -->
+    <string name="notification_channel_alarm_name">Alarmes de localização</string>
+    <string name="notification_channel_alarm_desc">Notificações de alta prioridade quando você entra ou sai de uma área monitorada</string>
+    <string name="notification_channel_service_name">Monitoramento de localização</string>
+    <string name="notification_channel_service_desc">Serviço em segundo plano que monitora sua localização para os geo-alarmes ativos</string>
+    <string name="notification_ringing_title">%1$s está tocando</string>
+    <string name="notification_action_dismiss">Desligar</string>
+    <string name="notification_action_snooze">Soneca</string>
+    <string name="notification_tracking_title">GeoAlarm monitorando localização</string>
+    <string name="notification_tracking_text">%1$d alarme(s) ativo(s)</string>
+
+    <!-- Permissions -->
+    <string name="permission_rationale_location">O GeoAlarm precisa de acesso à localização, inclusive em segundo plano, para detectar quando você entra ou sai das áreas dos seus alarmes.</string>
+    <string name="permission_grant">Conceder permissão</string>
+</resources>

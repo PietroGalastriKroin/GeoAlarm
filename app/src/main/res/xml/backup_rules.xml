@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <exclude domain="database" path="geoalarm.db" />
+    <exclude domain="database" path="geoalarm.db-wal" />
+    <exclude domain="database" path="geoalarm.db-shm" />
+</full-backup-content>

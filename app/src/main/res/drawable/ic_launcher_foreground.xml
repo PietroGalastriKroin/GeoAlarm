@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Location pin -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M54,26 C42,26 32,36 32,48 C32,64 54,86 54,86 C54,86 76,64 76,48 C76,36 66,26 54,26 Z" />
+    <!-- Pin inner circle -->
+    <path
+        android:fillColor="#3B6EF6"
+        android:pathData="M54,38 m-9,0 a9,9 0 1,0 18,0 a9,9 0 1,0 -18,0" />
+    <!-- Alarm clock bell accent -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M40,70 a14,10 0 0,0 28,0 Z" />
+</vector>
