@@ -190,6 +190,7 @@ fun AlarmEditScreen(
                         LocationPickerMap(
                             initialLatitude = alarm.latitude,
                             initialLongitude = alarm.longitude,
+                            radiusMeters = alarm.radiusMeters,
                             onCenterChanged = { lat, lon -> viewModel.setLocation(lat, lon) },
                             modifier = Modifier.fillMaxWidth().height(240.dp).clip(RoundedCornerShape(16.dp)),
                         )
