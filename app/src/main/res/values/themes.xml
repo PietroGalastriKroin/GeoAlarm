@@ -7,10 +7,14 @@
         <item name="android:windowLightStatusBar" tools:targetApi="23">true</item>
     </style>
 
-    <!-- Lock-screen alarm trigger: full screen, no title bar, keeps the screen on. -->
+    <!--
+      Lock-screen alarm trigger: full screen, no title bar. Showing over the lock screen and
+      turning the display on are NOT theme attributes (there is no public
+      android:windowShowWhenLocked / android:windowTurnScreenOn) — they're done at runtime in
+      AlarmTriggerActivity via Activity.setShowWhenLocked()/setTurnScreenOn() (API 27+, with a
+      WindowManager-flag fallback below that).
+    -->
     <style name="Theme.GeoAlarm.AlarmTrigger" parent="android:Theme.Material.NoActionBar.Fullscreen">
-        <item name="android:windowShowWhenLocked" tools:targetApi="27">true</item>
-        <item name="android:windowTurnScreenOn" tools:targetApi="27">true</item>
         <item name="android:windowBackground">@color/trigger_default_background</item>
     </style>
 </resources>
