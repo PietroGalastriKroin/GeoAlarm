@@ -54,6 +54,17 @@ android {
     }
 }
 
+// A transitive dependency was resolving androidx.core(-ktx) to a version newer than what this
+// project was written and tested against, which then demanded a compileSdk this project isn't
+// pinned to. Force it back to the pinned, known-good version below instead of chasing a moving
+// compileSdk target.
+configurations.all {
+    resolutionStrategy {
+        force("androidx.core:core:1.13.1")
+        force("androidx.core:core-ktx:1.13.1")
+    }
+}
+
 dependencies {
     // Core / lifecycle
     implementation("androidx.core:core-ktx:1.13.1")
