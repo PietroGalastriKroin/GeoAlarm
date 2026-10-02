@@ -88,6 +88,23 @@ object NotificationHelper {
             .setOngoing(true)
             .build()
 
+    /**
+     * Minimal placeholder shown the instant [com.geoalarm.app.service.AlarmRingingService]
+     * starts, before the alarm has been loaded from Room. A service started via
+     * `startForegroundService`/`PendingIntent.getForegroundService` must call
+     * `startForeground()` within a few seconds of every cold start or the system kills it;
+     * this satisfies that unconditionally, and is replaced (same notification id) once the
+     * real ringing notification is ready, or torn down immediately if it turns out there's
+     * nothing to ring (e.g. a distance-snooze recheck that isn't close enough yet).
+     */
+    fun buildPlaceholderNotification(context: Context): Notification =
+        NotificationCompat.Builder(context, Constants.NOTIFICATION_CHANNEL_SERVICE)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.app_name))
+            .setPriority(NotificationCompat.PRIORITY_MIN)
+            .setOngoing(true)
+            .build()
+
     private fun actionPendingIntent(context: Context, action: String, alarmId: Long): PendingIntent {
         val intent = Intent(context, AlarmActionReceiver::class.java).apply {
             this.action = action

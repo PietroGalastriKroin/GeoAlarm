@@ -208,7 +208,7 @@ fun AlarmEditScreen(
             item { SectionTitle(stringResource(R.string.edit_section_schedule)) }
             item {
                 Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
-                    DayOfWeek.entries.forEach { day ->
+                    DayOfWeek.values().forEach { day ->
                         FilterChip(
                             selected = day in alarm.activeDays,
                             onClick = { viewModel.toggleDay(day) },

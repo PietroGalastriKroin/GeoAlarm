@@ -28,7 +28,7 @@ data class GeoAlarm(
     val radiusMeters: Float,
     val transition: GeofenceTransition = GeofenceTransition.ENTER,
     val isEnabled: Boolean = true,
-    val activeDays: Set<DayOfWeek> = DayOfWeek.entries.toSet(),
+    val activeDays: Set<DayOfWeek> = DayOfWeek.values().toSet(),
     val soundEnabled: Boolean = true,
     val vibrationEnabled: Boolean = true,
     /** null = system default alarm ringtone */

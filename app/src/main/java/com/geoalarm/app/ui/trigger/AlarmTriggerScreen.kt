@@ -31,6 +31,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -92,15 +93,15 @@ fun AlarmTriggerScreen(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(top = 48.dp)) {
                 if (currentAlarm.showClock) {
-                    var now by remember { mutableFloatStateOf(0f) }
+                    var now by remember { mutableLongStateOf(System.currentTimeMillis()) }
                     LaunchedEffect(Unit) {
                         while (true) {
-                            now = System.currentTimeMillis().toFloat()
+                            now = System.currentTimeMillis()
                             delay(1_000)
                         }
                     }
                     Text(
-                        text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(now.toLong())),
+                        text = SimpleDateFormat("HH:mm", Locale.getDefault()).format(Date(now)),
                         fontSize = 56.sp,
                         fontWeight = FontWeight.Light,
                         color = Color.White,

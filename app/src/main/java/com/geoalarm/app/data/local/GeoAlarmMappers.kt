@@ -11,7 +11,7 @@ private fun Set<DayOfWeek>.toBitmask(): Int =
     fold(0) { mask, day -> mask or (1 shl day.value) }
 
 private fun Int.toDayOfWeekSet(): Set<DayOfWeek> =
-    DayOfWeek.entries.filterTo(mutableSetOf()) { (this shr it.value) and 1 == 1 }
+    DayOfWeek.values().filterTo(mutableSetOf()) { (this shr it.value) and 1 == 1 }
 
 fun GeoAlarmEntity.toDomain(): GeoAlarm = GeoAlarm(
     id = id,

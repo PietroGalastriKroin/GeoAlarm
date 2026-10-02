@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.WindowManager
 import androidx.activity.ComponentActivity
+import androidx.activity.addCallback
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,6 +31,9 @@ class AlarmTriggerActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         configureLockScreenWindow()
+
+        // The alarm must be dismissed or snoozed explicitly — back press does nothing.
+        onBackPressedDispatcher.addCallback(this) { /* no-op */ }
 
         alarmId = intent.getLongExtra(Constants.EXTRA_ALARM_ID, -1L)
         if (alarmId < 0) {
@@ -84,10 +88,5 @@ class AlarmTriggerActivity : ComponentActivity() {
             putExtra(Constants.EXTRA_ALARM_ID, alarmId)
         }
         ContextCompat.startForegroundService(this, intent)
-    }
-
-    @Suppress("DEPRECATION", "MissingSuperCall")
-    override fun onBackPressed() {
-        // The alarm must be dismissed or snoozed explicitly — back press does nothing.
     }
 }

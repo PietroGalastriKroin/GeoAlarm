@@ -40,6 +40,11 @@ class AlarmRingingService : LifecycleService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
+        // This service is always started via startForegroundService()/getForegroundService();
+        // the system requires startForeground() within seconds of every cold start, regardless
+        // of which action it was started with. The real notification (or a prompt teardown, if
+        // a distance-snooze recheck decides there's nothing to ring) replaces this right after.
+        startForeground(Constants.NOTIFICATION_ID_RINGING, NotificationHelper.buildPlaceholderNotification(this))
         val alarmId = intent?.getLongExtra(Constants.EXTRA_ALARM_ID, -1L)?.takeIf { it >= 0 }
         when (intent?.action) {
             Constants.ACTION_DISMISS_ALARM -> alarmId?.let { dismiss(it) }
@@ -91,6 +96,8 @@ class AlarmRingingService : LifecycleService() {
                 startRinging(alarmId)
             } else {
                 SnoozeScheduler.scheduleDistanceRecheck(this@AlarmRingingService, alarmId)
+                stopForegroundCompat()
+                stopSelf()
             }
         }
     }

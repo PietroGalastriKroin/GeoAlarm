@@ -4,6 +4,7 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.SystemClock
 import com.geoalarm.app.service.AlarmRingingService
 
@@ -28,11 +29,21 @@ object SnoozeScheduler {
 
     private fun schedule(context: Context, triggerAtElapsedRealtime: Long, pendingIntent: PendingIntent) {
         val alarmManager = context.getSystemService(AlarmManager::class.java)
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.ELAPSED_REALTIME_WAKEUP,
-            triggerAtElapsedRealtime,
-            pendingIntent,
-        )
+        val canUseExact = Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarmManager.canScheduleExactAlarms()
+        if (canUseExact) {
+            try {
+                alarmManager.setExactAndAllowWhileIdle(
+                    AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                    triggerAtElapsedRealtime,
+                    pendingIntent,
+                )
+                return
+            } catch (e: SecurityException) {
+                // Permission was revoked between the check and the call (OEM/user setting) — fall through.
+            }
+        }
+        // Without the exact-alarm permission, an inexact alarm still fires — just not bit-for-bit on time.
+        alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtElapsedRealtime, pendingIntent)
     }
 
     private fun ringAgainPendingIntent(context: Context, alarmId: Long): PendingIntent =
