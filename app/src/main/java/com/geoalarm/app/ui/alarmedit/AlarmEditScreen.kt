@@ -9,24 +9,30 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteOutline
+import androidx.compose.material.icons.filled.Image
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +43,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -98,259 +105,255 @@ fun AlarmEditScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (viewModel.isNew) stringResource(R.string.alarm_list_add) else alarm.title.ifBlank { "—" }) },
+                title = {
+                    Text(
+                        if (viewModel.isNew) stringResource(R.string.alarm_list_add) else alarm.title.ifBlank { "—" },
+                        fontWeight = FontWeight.SemiBold,
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onDone) { Icon(Icons.Filled.ArrowBack, contentDescription = null) }
                 },
                 actions = {
                     if (!viewModel.isNew) {
                         IconButton(onClick = viewModel::delete) {
-                            Icon(Icons.Filled.Delete, contentDescription = stringResource(R.string.edit_delete))
+                            Icon(Icons.Filled.DeleteOutline, contentDescription = stringResource(R.string.edit_delete))
                         }
                     }
                 },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background),
             )
         },
+        containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
         LazyColumn(
-            modifier = Modifier.padding(padding).padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp),
+            modifier = Modifier.fillMaxWidth().padding(padding),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             item {
-                Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = alarm.title,
-                    onValueChange = { title -> viewModel.update { it.copy(title = title) } },
-                    label = { Text(stringResource(R.string.edit_title_hint)) },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-                Spacer(Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = alarm.message,
-                    onValueChange = { message -> viewModel.update { it.copy(message = message) } },
-                    label = { Text(stringResource(R.string.edit_message_hint)) },
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                SectionCard {
+                    OutlinedTextField(
+                        value = alarm.title,
+                        onValueChange = { title -> viewModel.update { it.copy(title = title) } },
+                        label = { Text(stringResource(R.string.edit_title_hint)) },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    OutlinedTextField(
+                        value = alarm.message,
+                        onValueChange = { message -> viewModel.update { it.copy(message = message) } },
+                        label = { Text(stringResource(R.string.edit_message_hint)) },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                        Text("Alarme ativo", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                        Switch(checked = alarm.isEnabled, onCheckedChange = { enabled -> viewModel.update { it.copy(isEnabled = enabled) } })
+                    }
+                }
             }
 
             item {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Text("Alarme ativo", style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
-                    Switch(checked = alarm.isEnabled, onCheckedChange = { enabled -> viewModel.update { it.copy(isEnabled = enabled) } })
-                }
-            }
-
-            item { SectionTitle(stringResource(R.string.edit_section_location)) }
-            item {
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedTextField(
-                        value = "%.5f".format(alarm.latitude),
-                        onValueChange = { v -> v.toDoubleOrNull()?.let { viewModel.setLocation(it, alarm.longitude) } },
-                        label = { Text("Latitude") },
-                        modifier = Modifier.weight(1f),
-                    )
-                    OutlinedTextField(
-                        value = "%.5f".format(alarm.longitude),
-                        onValueChange = { v -> v.toDoubleOrNull()?.let { viewModel.setLocation(alarm.latitude, it) } },
-                        label = { Text("Longitude") },
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                Spacer(Modifier.height(8.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(onClick = { showMap = !showMap }, modifier = Modifier.weight(1f)) {
-                        Text(stringResource(R.string.edit_pick_on_map))
+                SectionCard(title = stringResource(R.string.edit_section_location)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedTextField(
+                            value = "%.5f".format(alarm.latitude),
+                            onValueChange = { v -> v.toDoubleOrNull()?.let { viewModel.setLocation(it, alarm.longitude) } },
+                            label = { Text("Latitude") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f),
+                        )
+                        OutlinedTextField(
+                            value = "%.5f".format(alarm.longitude),
+                            onValueChange = { v -> v.toDoubleOrNull()?.let { viewModel.setLocation(alarm.latitude, it) } },
+                            label = { Text("Longitude") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f),
+                        )
                     }
-                    OutlinedButton(
-                        onClick = {
-                            scope.launch {
-                                CurrentLocationFetcher.fetch(context)?.let { (lat, lon) -> viewModel.setLocation(lat, lon) }
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                    ) {
-                        Text(stringResource(R.string.edit_use_current_location))
-                    }
-                }
-                if (showMap) {
-                    Spacer(Modifier.height(8.dp))
-                    LocationPickerMap(
-                        initialLatitude = alarm.latitude,
-                        initialLongitude = alarm.longitude,
-                        onCenterChanged = { lat, lon -> viewModel.setLocation(lat, lon) },
-                        modifier = Modifier.fillMaxWidth().height(260.dp).clip(RoundedCornerShape(16.dp)),
-                    )
-                }
-                Spacer(Modifier.height(12.dp))
-                Text(stringResource(R.string.edit_radius) + ": ${alarm.radiusMeters.toInt()} m")
-                Slider(
-                    value = alarm.radiusMeters,
-                    onValueChange = { r -> viewModel.update { it.copy(radiusMeters = r) } },
-                    valueRange = 50f..2000f,
-                )
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    listOf(GeofenceTransition.ENTER, GeofenceTransition.EXIT).forEach { transition ->
-                        FilterChip(
-                            selected = alarm.transition == transition,
-                            onClick = { viewModel.setTransition(transition) },
-                            label = {
-                                Text(
-                                    stringResource(
-                                        if (transition == GeofenceTransition.ENTER) R.string.alarm_transition_enter else R.string.alarm_transition_exit,
-                                    ),
-                                )
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedButton(onClick = { showMap = !showMap }, modifier = Modifier.weight(1f)) {
+                            Text(stringResource(R.string.edit_pick_on_map))
+                        }
+                        OutlinedButton(
+                            onClick = {
+                                scope.launch {
+                                    CurrentLocationFetcher.fetch(context)?.let { (lat, lon) -> viewModel.setLocation(lat, lon) }
+                                }
                             },
+                            modifier = Modifier.weight(1f),
+                        ) {
+                            Text(stringResource(R.string.edit_use_current_location))
+                        }
+                    }
+                    if (showMap) {
+                        LocationPickerMap(
+                            initialLatitude = alarm.latitude,
+                            initialLongitude = alarm.longitude,
+                            onCenterChanged = { lat, lon -> viewModel.setLocation(lat, lon) },
+                            modifier = Modifier.fillMaxWidth().height(240.dp).clip(RoundedCornerShape(16.dp)),
                         )
                     }
+                    LabeledSlider(
+                        label = stringResource(R.string.edit_radius),
+                        valueText = "${alarm.radiusMeters.toInt()} m",
+                        value = alarm.radiusMeters,
+                        onValueChange = { r -> viewModel.update { it.copy(radiusMeters = r) } },
+                        valueRange = 50f..2000f,
+                    )
+                    ChipGroup(
+                        items = listOf(GeofenceTransition.ENTER, GeofenceTransition.EXIT),
+                        isSelected = { it == alarm.transition },
+                        onSelect = viewModel::setTransition,
+                        label = { stringResource(if (it == GeofenceTransition.ENTER) R.string.alarm_transition_enter else R.string.alarm_transition_exit) },
+                    )
                 }
             }
 
-            item { SectionTitle(stringResource(R.string.edit_section_schedule)) }
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp), modifier = Modifier.fillMaxWidth()) {
-                    DayOfWeek.values().forEach { day ->
-                        FilterChip(
-                            selected = day in alarm.activeDays,
-                            onClick = { viewModel.toggleDay(day) },
-                            label = { Text(day.getDisplayName(TextStyle.NARROW, Locale("pt", "BR"))) },
-                        )
-                    }
+                SectionCard(title = stringResource(R.string.edit_section_schedule)) {
+                    ChipGroup(
+                        items = DayOfWeek.values().toList(),
+                        isSelected = { it in alarm.activeDays },
+                        onSelect = viewModel::toggleDay,
+                        label = { it.getDisplayName(TextStyle.SHORT, Locale("pt", "BR")).replaceFirstChar(Char::uppercase) },
+                    )
                 }
             }
 
-            item { SectionTitle(stringResource(R.string.edit_section_sound)) }
             item {
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.edit_sound_enabled), modifier = Modifier.weight(1f))
-                    Switch(checked = alarm.soundEnabled, onCheckedChange = { v -> viewModel.update { it.copy(soundEnabled = v) } })
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    OutlinedButton(
-                        onClick = {
-                            val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
-                                putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
-                                putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
-                                putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
-                                alarm.soundUri?.let { putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, android.net.Uri.parse(it)) }
-                            }
-                            ringtonePicker.launch(intent)
-                        },
-                        modifier = Modifier.weight(1f),
-                    ) { Text(stringResource(R.string.edit_choose_ringtone)) }
-                    OutlinedButton(
-                        onClick = { audioImportPicker.launch(arrayOf("audio/*")) },
-                        modifier = Modifier.weight(1f),
-                    ) { Text(stringResource(R.string.edit_import_audio)) }
-                }
+                SectionCard(title = stringResource(R.string.edit_section_sound)) {
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.edit_sound_enabled), modifier = Modifier.weight(1f))
+                        Switch(checked = alarm.soundEnabled, onCheckedChange = { v -> viewModel.update { it.copy(soundEnabled = v) } })
+                    }
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                        OutlinedButton(
+                            onClick = {
+                                val intent = Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+                                    putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_ALARM)
+                                    putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+                                    putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+                                    alarm.soundUri?.let { putExtra(RingtoneManager.EXTRA_RINGTONE_EXISTING_URI, android.net.Uri.parse(it)) }
+                                }
+                                ringtonePicker.launch(intent)
+                            },
+                            modifier = Modifier.weight(1f),
+                        ) { Text(stringResource(R.string.edit_choose_ringtone), maxLines = 1) }
+                        OutlinedButton(
+                            onClick = { audioImportPicker.launch(arrayOf("audio/*")) },
+                            modifier = Modifier.weight(1f),
+                        ) { Text(stringResource(R.string.edit_import_audio), maxLines = 1) }
+                    }
 
-                Spacer(Modifier.height(12.dp))
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.edit_vibration_enabled), modifier = Modifier.weight(1f))
-                    Switch(checked = alarm.vibrationEnabled, onCheckedChange = { v -> viewModel.update { it.copy(vibrationEnabled = v) } })
-                }
-                Text(stringResource(R.string.edit_vibration_pattern), style = MaterialTheme.typography.bodyMedium)
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    VibrationPattern.entries.forEach { pattern ->
-                        FilterChip(
-                            selected = alarm.vibrationPattern == pattern,
-                            onClick = { viewModel.update { it.copy(vibrationPattern = pattern) } },
-                            label = { Text(vibrationPatternLabel(pattern)) },
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.edit_vibration_enabled), modifier = Modifier.weight(1f))
+                        Switch(checked = alarm.vibrationEnabled, onCheckedChange = { v -> viewModel.update { it.copy(vibrationEnabled = v) } })
+                    }
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        SubLabel(stringResource(R.string.edit_vibration_pattern))
+                        ChipGroup(
+                            items = VibrationPattern.entries,
+                            isSelected = { it == alarm.vibrationPattern },
+                            onSelect = { p -> viewModel.update { it.copy(vibrationPattern = p) } },
+                            label = { vibrationPatternLabel(it) },
                         )
                     }
-                }
 
-                Spacer(Modifier.height(12.dp))
-                Text(stringResource(R.string.edit_volume_fade_in) + ": ${alarm.volumeFadeInSeconds}s")
-                Slider(
-                    value = alarm.volumeFadeInSeconds.toFloat(),
-                    onValueChange = { v -> viewModel.update { it.copy(volumeFadeInSeconds = v.toInt()) } },
-                    valueRange = 0f..60f,
-                    steps = 11,
-                )
+                    LabeledSlider(
+                        label = stringResource(R.string.edit_volume_fade_in),
+                        valueText = "${alarm.volumeFadeInSeconds}s",
+                        value = alarm.volumeFadeInSeconds.toFloat(),
+                        onValueChange = { v -> viewModel.update { it.copy(volumeFadeInSeconds = v.toInt()) } },
+                        valueRange = 0f..60f,
+                        steps = 11,
+                    )
+                }
             }
 
-            item { SectionTitle(stringResource(R.string.edit_section_snooze)) }
             item {
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    SnoozeType.entries.forEach { type ->
-                        FilterChip(
-                            selected = alarm.snoozeType == type,
-                            onClick = { viewModel.update { it.copy(snoozeType = type) } },
-                            label = { Text(snoozeTypeLabel(type)) },
-                        )
-                    }
-                }
-                when (alarm.snoozeType) {
-                    SnoozeType.TIME -> {
-                        Text(stringResource(R.string.edit_snooze_minutes) + ": ${alarm.snoozeMinutes} min")
-                        Slider(
+                SectionCard(title = stringResource(R.string.edit_section_snooze)) {
+                    ChipGroup(
+                        items = SnoozeType.entries,
+                        isSelected = { it == alarm.snoozeType },
+                        onSelect = { t -> viewModel.update { it.copy(snoozeType = t) } },
+                        label = { snoozeTypeLabel(it) },
+                    )
+                    when (alarm.snoozeType) {
+                        SnoozeType.TIME -> LabeledSlider(
+                            label = stringResource(R.string.edit_snooze_minutes),
+                            valueText = "${alarm.snoozeMinutes} min",
                             value = alarm.snoozeMinutes.toFloat(),
                             onValueChange = { v -> viewModel.update { it.copy(snoozeMinutes = v.toInt()) } },
                             valueRange = 1f..30f,
                         )
-                    }
-                    SnoozeType.DISTANCE -> {
-                        Text(stringResource(R.string.edit_snooze_distance) + ": ${alarm.snoozeDistanceMeters.toInt()} m")
-                        Slider(
+                        SnoozeType.DISTANCE -> LabeledSlider(
+                            label = stringResource(R.string.edit_snooze_distance),
+                            valueText = "${alarm.snoozeDistanceMeters.toInt()} m",
                             value = alarm.snoozeDistanceMeters,
                             onValueChange = { v -> viewModel.update { it.copy(snoozeDistanceMeters = v) } },
                             valueRange = 10f..500f,
                         )
+                        SnoozeType.NONE -> Unit
                     }
-                    SnoozeType.NONE -> Unit
                 }
             }
 
-            item { SectionTitle(stringResource(R.string.edit_section_lockscreen)) }
             item {
-                Text(stringResource(R.string.edit_dismiss_style), style = MaterialTheme.typography.bodyMedium)
-                Row(horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    DismissStyle.entries.forEach { style ->
-                        FilterChip(
-                            selected = alarm.dismissStyle == style,
-                            onClick = { viewModel.update { it.copy(dismissStyle = style) } },
-                            label = { Text(dismissStyleLabel(style)) },
+                SectionCard(title = stringResource(R.string.edit_section_lockscreen)) {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        SubLabel(stringResource(R.string.edit_dismiss_style))
+                        ChipGroup(
+                            items = DismissStyle.entries,
+                            isSelected = { it == alarm.dismissStyle },
+                            onSelect = { s -> viewModel.update { it.copy(dismissStyle = s) } },
+                            label = { dismissStyleLabel(it) },
                         )
                     }
-                }
-                Spacer(Modifier.height(8.dp))
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.edit_show_clock), modifier = Modifier.weight(1f))
-                    Switch(checked = alarm.showClock, onCheckedChange = { v -> viewModel.update { it.copy(showClock = v) } })
-                }
-                Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-                    Text(stringResource(R.string.edit_show_distance), modifier = Modifier.weight(1f))
-                    Switch(checked = alarm.showDistance, onCheckedChange = { v -> viewModel.update { it.copy(showDistance = v) } })
-                }
-                Spacer(Modifier.height(8.dp))
-                Text(stringResource(R.string.edit_background), style = MaterialTheme.typography.bodyMedium)
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.padding(top = 8.dp)) {
-                    AccentColorSwatches.forEach { color ->
-                        Box(
-                            modifier = Modifier
-                                .size(36.dp)
-                                .clip(CircleShape)
-                                .background(color)
-                                .clickable {
-                                    viewModel.update { it.copy(backgroundColorArgb = color.value.toLong(), backgroundImageUri = null) }
-                                },
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            if (alarm.backgroundColorArgb == color.value.toLong()) {
-                                Icon(Icons.Filled.Check, contentDescription = null, tint = Color.White)
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.edit_show_clock), modifier = Modifier.weight(1f))
+                        Switch(checked = alarm.showClock, onCheckedChange = { v -> viewModel.update { it.copy(showClock = v) } })
+                    }
+                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+                        Text(stringResource(R.string.edit_show_distance), modifier = Modifier.weight(1f))
+                        Switch(checked = alarm.showDistance, onCheckedChange = { v -> viewModel.update { it.copy(showDistance = v) } })
+                    }
+                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                        SubLabel(stringResource(R.string.edit_background))
+                        Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                            AccentColorSwatches.forEach { color ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clip(CircleShape)
+                                        .background(color)
+                                        .clickable {
+                                            viewModel.update { it.copy(backgroundColorArgb = color.value.toLong(), backgroundImageUri = null) }
+                                        },
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    if (alarm.backgroundColorArgb == color.value.toLong()) {
+                                        Icon(Icons.Filled.Check, contentDescription = null, tint = Color.White)
+                                    }
+                                }
                             }
+                        }
+                        OutlinedButton(onClick = { imageImportPicker.launch(arrayOf("image/*")) }) {
+                            Icon(Icons.Filled.Image, contentDescription = null, modifier = Modifier.size(18.dp))
+                            Spacer(Modifier.width(8.dp))
+                            Text("Escolher imagem de fundo")
                         }
                     }
                 }
-                Spacer(Modifier.height(8.dp))
-                OutlinedButton(onClick = { imageImportPicker.launch(arrayOf("image/*")) }) {
-                    Text("Escolher imagem de fundo")
-                }
             }
 
             item {
-                Button(onClick = viewModel::save, modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp)) {
-                    Text(stringResource(R.string.edit_save))
+                Button(
+                    onClick = viewModel::save,
+                    modifier = Modifier.fillMaxWidth().height(52.dp).padding(bottom = 8.dp),
+                    shape = RoundedCornerShape(16.dp),
+                ) {
+                    Text(stringResource(R.string.edit_save), style = MaterialTheme.typography.titleMedium)
                 }
             }
         }
@@ -358,10 +361,72 @@ fun AlarmEditScreen(
 }
 
 @Composable
-private fun SectionTitle(text: String) {
-    Column {
-        HorizontalDivider()
-        Text(text, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 12.dp))
+private fun SectionCard(
+    title: String? = null,
+    content: @Composable ColumnScope.() -> Unit,
+) {
+    Card(
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
+        ) {
+            if (title != null) {
+                Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold)
+            }
+            content()
+        }
+    }
+}
+
+@Composable
+private fun SubLabel(text: String) {
+    Text(text, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun <T> ChipGroup(
+    items: List<T>,
+    isSelected: (T) -> Boolean,
+    onSelect: (T) -> Unit,
+    label: @Composable (T) -> String,
+) {
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        items.forEach { item ->
+            FilterChip(
+                selected = isSelected(item),
+                onClick = { onSelect(item) },
+                label = { Text(label(item), maxLines = 1) },
+            )
+        }
+    }
+}
+
+@Composable
+private fun LabeledSlider(
+    label: String,
+    valueText: String,
+    value: Float,
+    onValueChange: (Float) -> Unit,
+    valueRange: ClosedFloatingPointRange<Float>,
+    steps: Int = 0,
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Row(modifier = Modifier.fillMaxWidth()) {
+            SubLabel(label)
+            Spacer(Modifier.weight(1f))
+            Text(valueText, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Medium)
+        }
+        Slider(value = value, onValueChange = onValueChange, valueRange = valueRange, steps = steps)
     }
 }
 
